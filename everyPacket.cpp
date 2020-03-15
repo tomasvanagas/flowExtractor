@@ -57,9 +57,11 @@ void everyPacketHandler(u_char *args, const struct pcap_pkthdr* header, const u_
 
     if (payload_length > 0) {
         // SSH
-        if((memcmp(payload, "SSH-1", 5) == 0) || (memcmp(payload, "SSH-2", 5) == 0)){
-            if(handleSSH(srcIp, srcPort, dstIp, dstPort, payload, payload_length)) {
-                return;
+        if(memcmp(payload, "SSH-", 4) == 0){
+            if(payload_length < 200) {
+                if(handleSSH(srcIp, srcPort, dstIp, dstPort, payload, payload_length)) {
+                    return;
+                }
             }
         }
 
