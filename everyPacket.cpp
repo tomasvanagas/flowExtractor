@@ -73,7 +73,7 @@ void everyPacketHandler(u_char *args, const struct pcap_pkthdr* header, const u_
         }
 
         // Web
-        if((memcmp(payload, "POST ", 5) == 0) || (memcmp(payload, "GET ", 4) == 0) || (memcmp(payload, "HTTP ", 5) == 0) ||
+        if((memcmp(payload, "POST ", 5) == 0) || (memcmp(payload, "GET ", 4) == 0) || (memcmp(payload, "HTTP", 4) == 0) ||
         (memcmp(payload, "OPTIONS ", 8) == 0) || (memcmp(payload, "UPLOAD ", 7) == 0) || (memcmp(payload, "TRACE ", 6) == 0) ) {
             if(handleWordpress(srcIp, srcPort, dstIp, dstPort, payload, payload_length)) {
                 return;
