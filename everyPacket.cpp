@@ -8,6 +8,7 @@
 #include "ssh.cpp"
 #include "bitcoin.cpp"
 #include "wordpress.cpp"
+#include "pop3.cpp"
 
 
 
@@ -79,6 +80,16 @@ void everyPacketHandler(u_char *args, const struct pcap_pkthdr* header, const u_
                 return;
             }
         }
+
+        // POP3
+        if(dstPort == 110 || srcPort == 110) {
+            if(memcmp(payload, "USER", 4) == 0 || memcmp(payload, "PASS", 4) == 0 || memcmp(payload, "+OK ", 4) == 0 ) {
+                if(handlePop3(srcIp, srcPort, dstIp, dstPort, payload, payload_length)) {
+                    return;
+                }
+            }
+        }
+
 
 
         /*

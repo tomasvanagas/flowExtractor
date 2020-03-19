@@ -58,9 +58,6 @@ void urldecode2(char *dst, const char *src) {
 
 bool handleWordpress(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char *payload, int payload_length) {
     // https://github.com/nodejs/http-parser
-    
-    //sessionStrings["1.1.1.1"]["key1"] = "value1";
-    //sessionInts["1.1.1.1"]["key1"] = 1;
 
     if(memcmp(myIp, srcIp, sizeof(myIp)) == 0) {
         char sessionName[22] = { 0 };
@@ -126,7 +123,7 @@ bool handleWordpress(char *srcIp, int srcPort, char *dstIp, int dstPort, const u
                     }
                 } 
             }
-            return 1;
+            return true;
         }
     }
     else {
@@ -166,7 +163,7 @@ bool handleWordpress(char *srcIp, int srcPort, char *dstIp, int dstPort, const u
                                 FILE* pFile = fopen("./captured/wordpress.txt", "a");
                                 fwrite(dataToWrite, sizeof(char), strlen(dataToWrite), pFile);
                                 fclose(pFile);
-                                break;
+                                return true;
                             }
                         }
                     }
