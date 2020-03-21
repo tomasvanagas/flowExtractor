@@ -99,7 +99,7 @@ bool handleVnc(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char 
                                     // 8 --> Auth successful
                                     if(memcmp(payload, "\x00\x00\x00\x00", 4) == 0) {
                                         char dataToWrite[2048] = { 0 };
-                                        sprintf(dataToWrite, "%s:%d: %s:%s:%s:%s:%s:%s:%s\n",   srcIp, 
+                                        sprintf(dataToWrite, "%s:%d:%s:%s:%s:%s:%s:%s:%s\n",    srcIp, 
                                                                                                 srcPort, 
                                                                                                 sessionStringsVnc[sessionName]["serverVersion"].c_str(), 
                                                                                                 sessionStringsVnc[sessionName]["clientVersion"].c_str(),
