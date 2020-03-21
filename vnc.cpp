@@ -26,8 +26,8 @@ bool handleVnc(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char 
 
         if(memcmp(payload, "RFB 003.00", 10) == 0) {
             // 1 --> Server version
-            char serverVersion[12] = { 0 };
-            memcpy(serverVersion, payload, 11);
+            char serverVersion[8] = { 0 };
+            memcpy(serverVersion, payload + 4, 7);
 
             sessionStringsVnc[sessionName]["serverVersion"] = serverVersion;
             sessionStringsVnc[sessionName]["clientVersion"] = "";
@@ -50,11 +50,23 @@ bool handleVnc(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char 
                             
                             char securityTypes[1024] = { 0 }; 
                             for(int i=1; i<payload_length; i++) {
-                                sprintf(securityTypes, "%s%.2X ", securityTypes, (unsigned char)(payload[0 + i]));
+                                if(i!=1) {
+                                    sprintf(securityTypes, "%s ", securityTypes);
+                                }
+                                sprintf(securityTypes, "%s%.2X", securityTypes, (unsigned char)(payload[0 + i]));
                             }
 
                             sessionStringsVnc[sessionName]["serverSecurityTypes"] = securityTypes;
                             //printf("%s\n", securityTypes);
+
+
+                            // Fingerprint server
+                            char dataToWrite[2048] = { 0 };
+                            sprintf(dataToWrite, "%s:%d:%s:%s:\n",   srcIp, srcPort, sessionStringsVnc[sessionName]["serverVersion"].c_str(), sessionStringsVnc[sessionName]["serverSecurityTypes"].c_str());
+                            FILE* pFile = fopen("./captured/vncFingerprints.txt", "a");
+                            fwrite(dataToWrite, sizeof(char), strlen(dataToWrite), pFile);
+                            fclose(pFile);
+
                             return true;
                         }
                     }
@@ -83,32 +95,29 @@ bool handleVnc(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char 
                                 if(memcmp(payload, "\x00\x00\x00", 3) == 0) {
                                     // 7 --> Auth response from server
 
-                                    for(int i=0; i<4; i++) {
-                                        printf("%.2x ", (unsigned char)(payload[0 + i]));
-                                    }
-
                                     if(payload[3] > 2) {
+                                        for(int i=0; i<4; i++) {
+                                            printf("%.2x ", (unsigned char)(payload[0 + i]));
+                                        }
                                         char authResponseString[256] = { 0 };
                                         memcpy(authResponseString, payload + 4, payload[3]);
                                         printf("%s", authResponseString);
+                                        printf("\n");
                                     }
 
-                                    printf("\n");
-
-
+                                    
                                     // 8 --> Auth successful
                                     if(memcmp(payload, "\x00\x00\x00\x00", 4) == 0) {
                                         char dataToWrite[2048] = { 0 };
-                                        sprintf(dataToWrite, "%s:%d:%s:%s:%s:%s:%s:%s:%s\n",    srcIp, 
-                                                                                                srcPort, 
-                                                                                                sessionStringsVnc[sessionName]["serverVersion"].c_str(), 
-                                                                                                sessionStringsVnc[sessionName]["clientVersion"].c_str(),
-                                                                                                sessionStringsVnc[sessionName]["serverSecurityTypes"].c_str(),
-                                                                                                sessionStringsVnc[sessionName]["clientSecurityChoice"].c_str(),
-                                                                                                sessionStringsVnc[sessionName]["serverSecurityChallenge"].c_str(),
-                                                                                                sessionStringsVnc[sessionName]["serverSecurityTypes"].c_str(),
-                                                                                                sessionStringsVnc[sessionName]["clientSecuritySolution"].c_str()
-                                                                                            );
+                                        sprintf(dataToWrite, "%s:%d:%s:%s:%s:%s:%s:%s\n",   srcIp, 
+                                                                                            srcPort, 
+                                                                                            sessionStringsVnc[sessionName]["serverVersion"].c_str(), 
+                                                                                            sessionStringsVnc[sessionName]["clientVersion"].c_str(),
+                                                                                            sessionStringsVnc[sessionName]["serverSecurityTypes"].c_str(),
+                                                                                            sessionStringsVnc[sessionName]["clientSecurityChoice"].c_str(),
+                                                                                            sessionStringsVnc[sessionName]["serverSecurityChallenge"].c_str(),
+                                                                                            sessionStringsVnc[sessionName]["clientSecuritySolution"].c_str()
+                                                                                        );
                                         FILE* pFile = fopen("./captured/vnc.txt", "a");
                                         fwrite(dataToWrite, sizeof(char), strlen(dataToWrite), pFile);
                                         fclose(pFile);
@@ -140,8 +149,8 @@ bool handleVnc(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char 
                 
                 if(memcmp(payload, "RFB 003.00", 10) == 0) {
                     // 2 --> Client version
-                    char clientVersion[12] = { 0 };
-                    memcpy(clientVersion, payload, 11);
+                    char clientVersion[8] = { 0 };
+                    memcpy(clientVersion, payload + 4, 7);
                     sessionStringsVnc[sessionName]["clientVersion"] = clientVersion;
                     //printf("%s\n-------\n", clientVersion);
                     return true;
