@@ -9,6 +9,7 @@
 #include "bitcoin.cpp"
 #include "wordpress.cpp"
 #include "pop3.cpp"
+#include "vnc.cpp"
 
 
 
@@ -88,6 +89,11 @@ void everyPacketHandler(u_char *args, const struct pcap_pkthdr* header, const u_
                     return;
                 }
             }
+        }
+
+        // VNC
+        if(handleVnc(srcIp, srcPort, dstIp, dstPort, payload, payload_length)) {
+            return;
         }
 
 

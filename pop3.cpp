@@ -76,7 +76,7 @@ bool handlePop3(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char
                     fwrite(dataToWrite, sizeof(char), strlen(dataToWrite), pFile);
                     fclose(pFile);
 
-                    printf("%s", dataToWrite);
+                    //printf("%s", dataToWrite);
                     sessionStringsPop3[sessionName]["user"].clear();
                     sessionStringsPop3[sessionName]["pass"].clear();
                     sessionIntsPop3[sessionName]["userOK"] = 0;
