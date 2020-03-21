@@ -24,7 +24,7 @@ bool handleVnc(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char 
         sprintf(sessionName, "%s:%d", srcIp, srcPort);
 
 
-        if(memcmp(payload, "RFB 003.00", 10) == 0) {
+        if(memcmp(payload, "RFB 00", 6) == 0) {
             // 1 --> Server version
             char serverVersion[8] = { 0 };
             memcpy(serverVersion, payload + 4, 7);
