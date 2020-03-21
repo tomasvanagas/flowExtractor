@@ -21,7 +21,7 @@ bool handleVnc(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char 
     // server --> client
     if(memcmp(myIp, dstIp, sizeof(myIp)) == 0) {
         char sessionName[22] = { 0 };
-        sprintf(sessionName, "%s:%d", dstIp, dstPort);
+        sprintf(sessionName, "%s:%d", srcIp, srcPort);
 
 
         if(memcmp(payload, "RFB 003.00", 10) == 0) {
@@ -133,7 +133,7 @@ bool handleVnc(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char 
     // client --> server
     else {
         char sessionName[22] = { 0 };
-        sprintf(sessionName, "%s:%d", srcIp, srcPort);
+        sprintf(sessionName, "%s:%d", dstIp, dstPort);
 
         if(strlen(sessionStringsVnc[sessionName]["serverVersion"].c_str()) > 0) {
             if(strlen(sessionStringsVnc[sessionName]["clientVersion"].c_str()) == 0) {
