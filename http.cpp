@@ -53,9 +53,20 @@ bool handleHTTP(char *srcIp, int srcPort, char *dstIp, int dstPort, const u_char
                         fwrite(visitedUrl, sizeof(char), strlen(visitedUrl), pFile);
                         fclose(pFile);
 
-                        //sessionStrings[sessionName]["Host"] = it->value.c_str();
-                        break;
+                        sessionStrings[sessionName]["Host"] = it->value.c_str();
                     }
+                    else if(it->name.compare("Authorization") == 0) {
+                        char authorization[2048] = { 0 };
+                        sprintf(authorization, "%s:%s\n", sessionStrings[sessionName]["Host"].c_str(), it->value.c_str());
+                        printf("%s", authorization);
+
+                        FILE* pFile = fopen("./captured/httpAuth.txt", "a");
+                        fwrite(authorization, sizeof(char), strlen(authorization), pFile);
+                        fclose(pFile);
+
+                        sessionStrings[sessionName]["Authorization"] = it->value.c_str();
+                    }
+
                 }
 
                 
